@@ -407,6 +407,7 @@ function useScrollToBottom(
   // for auto-scroll
 
   const [autoScroll, setAutoScroll] = useState(true);
+
   function scrollDomToBottom() {
     const dom = scrollRef.current;
     if (dom) {
@@ -450,6 +451,7 @@ export function ChatActions(props: {
 
   // switch themes
   const theme = config.theme;
+
   function nextTheme() {
     const themes = [Theme.Auto, Theme.Light, Theme.Dark];
     const themeIndex = themes.indexOf(theme);
@@ -1236,6 +1238,7 @@ function _Chat() {
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
   );
+
   function setMsgRenderIndex(newIndex: number) {
     newIndex = Math.min(renderMessages.length - CHAT_PAGE_SIZE, newIndex);
     newIndex = Math.max(0, newIndex);
@@ -1271,6 +1274,7 @@ function _Chat() {
     setHitBottom(isHitBottom);
     setAutoScroll(isHitBottom);
   };
+
   function scrollToBottom() {
     setMsgRenderIndex(renderMessages.length - CHAT_PAGE_SIZE);
     scrollDomToBottom();
@@ -1315,21 +1319,18 @@ function _Chat() {
         console.log("[Command] got settings from url: ", payload);
 
         if (payload.key || payload.url) {
-          showConfirm(
-            Locale.URLCommand.Settings +
-              `\n${JSON.stringify(payload, null, 4)}`,
-          ).then((res) => {
-            if (!res) return;
-            if (payload.key) {
-              accessStore.update(
-                (access) => (access.openaiApiKey = payload.key!),
-              );
-            }
-            if (payload.url) {
-              accessStore.update((access) => (access.openaiUrl = payload.url!));
-            }
-            accessStore.update((access) => (access.useCustomConfig = true));
-          });
+          // 直接应用设置，不显示确认对话框
+          if (payload.key) {
+            accessStore.update(
+              (access) => (access.openaiApiKey = payload.key!),
+            );
+          }
+          if (payload.url) {
+            accessStore.update((access) => (access.openaiUrl = payload.url!));
+          }
+          accessStore.update((access) => (access.useCustomConfig = true));
+
+          console.log("[Command] settings applied automatically");
         }
       } catch {
         console.error("[Command] failed to get settings from url: ", text);
